@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GESA JAP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef1f6;font-family:Arial,sans-serif;color:#17243c}
+header{background:#101d38;color:#e6bd63;text-align:center;padding:25px 15px}
+header h1{margin:0;font-size:30px;letter-spacing:3px}
+header p{margin:7px 0 0;font-size:12px;color:white}
+main{max-width:520px;margin:22px auto;padding:15px}
+.card{background:white;padding:20px;border-radius:14px;margin-bottom:15px;box-shadow:0 3px 12px #0001}
+h2{margin-top:0;color:#17243c}
+input,button{width:100%;padding:13px;margin:7px 0;border-radius:8px;font-size:15px}
+input{border:1px solid #ccd2dc}
+button{border:0;background:#c69b43;color:#17243c;font-weight:bold;cursor:pointer}
+button.secondary{background:#172b4d;color:white}
+.small{font-size:13px;color:#667085}
+.hidden{display:none}
+.item{padding:12px 0;border-bottom:1px solid #eee}
+.amount{font-size:22px;font-weight:bold;color:#a47a27}
+#message{white-space:pre-wrap;font-size:13px;color:#a12b2b}
+</style>
+</head>
+<body>
+<header>
+<h1>GESA JAP</h1>
+<p>SISTEM PINJAMAN ANGGOTA</p>
+</header>
+<main>
+<section id="login" class="card">
+<h2>Selamat Datang</h2>
+<p class="small">Masuk menggunakan username dan password.</p>
+<input id="username" placeholder="Username" autocomplete="username">
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
+<button onclick="loginUser()">MASUK</button>
+<div id="message"></div>
+</section>
+
+<section id="dashboard" class="hidden">
+<div class="card">
+<h2 id="welcome">Dashboard</h2>
+<p class="small" id="roleText"></p>
+<button class="secondary" onclick="logoutUser()">KELUAR</button>
+</div>
+
+<div id="memberArea" class="hidden">
+<div class="card">
+<h2>Informasi Pinjaman</h2>
+<div class="item">Pinjaman pokok <b>Rp500.000</b></div>
+<div class="item">Biaya layanan <b>Rp50.000</b></div>
+<div class="item">Dana diterima <b>Rp450.000</b></div>
+<div class="item">Pengembalian <b>Rp500.000</b></div>
+<p class="small">Pengajuan dibuka tanggal 5–25 setiap bulan. Jatuh tempo tanggal 1 bulan berikutnya.</p>
+<button onclick="applyLoan()">AJUKAN PINJAMAN</button>
+</div>
+<div class="card">
+<h2>Riwayat Pinjaman Saya</h2>
+<div id="myLoans">Memuat data...</div>
+</div>
+</div>
+
+<div id="adminArea" class="hidden">
+<div class="card">
+<h2>Data Seluruh Pinjaman</h2>
+<button class="secondary" onclick="loadAdminLoans()">SEGARKAN DATA</button>
+<div id="allLoans">Memuat data...</div>
+</div>
+</div>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL = "ISI_URL_SUPABASE";
+const SUPABASE_ANON_KEY = "ISI_ANON_PUBLIC_KEY";
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let currentUser=null;
+let currentProfile=null;
+
+function showMessage(t){
+ document.getElementById("message").textContent=t;
+}
+
+async function loginUser(){
+ const u=document.getElementById("username").value.trim().toLowerCase();
+ const p=document.getElementById("password").value;
+ if(!u||!p){showMessage("Isi username dan password.");return;}
+ showMessage("Memeriksa akun...");
+ const {data,error}=await db.auth.signInWithPassword({
+  email:u+"@gesajap.invalid",password:p
+ });
+ if(error){showMessage("Login gagal: "+error.message);return;}
+ currentUser=data.user;
+ const {data:profile,error:pe}=await db.from("profiles")
+  .select("*").eq("id",currentUser.id).single();
+ if(pe||!profile){
+  await db.auth.signOut();
+  showMessage("Profil akun tidak ditemukan. Hubungi bendahara.");
+  return;
+ }
+ currentProfile=profile;
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+ document.getElementById("welcome").textContent="Halo, "+profile.full_name;
+ document.getElementById("roleText").textContent=
+  profile.role==="admin"?"Bendahara GESA JAP":"Anggota GESA JAP";
+ if(profile.role==="admin"){
+  document.getElementById("adminArea").classList.remove("hidden");
+  loadAdminLoans();
+ }else{
+  document.getElementById("memberArea").classList.remove("hidden");
+  loadMyLoans();
+ }
+}
+
+async function logoutUser(){
+ await db.auth.signOut();
+ location.reload();
+}
+
+function nextDueDate(){
+ const d=new Date();
+ return new Date(d.getFullYear(),d.getMonth()+1,1)
+  .toISOString().slice(0,10);
+}
+
+async function applyLoan(){
+ const now=new Date();
+ if(now.getDate()<5||now.getDate()>25){
+  alert("Pengajuan hanya dibuka tanggal 5 sampai 25 setiap bulan.");
+  return;
+ }
+ const {data:existing,error:checkError}=await db.from("loans")
+  .select("id,status").eq("member_id",currentUser.id)
+  .in("status",["requested","approved","disbursed","overdue"]);
+ if(checkError){alert(checkError.message);return;}
+ if(existing&&existing.length){
+  alert("Masih ada pinjaman yang belum lunas.");
+  return;
+ }
+ const {error}=await db.from("loans").insert({
+  member_id:currentUser.id,
+  principal:500000,
+  service_fee:50000,
+  net_disbursed:450000,
+  repayment_amount:500000,
+  due_date:nextDueDate(),
+  status:"requested"
+ });
+ if(error){alert("Pengajuan gagal: "+error.message);return;}
+ alert("Pengajuan berhasil dikirim kepada bendahara.");
+ loadMyLoans();
+}
+
+async function loadMyLoans(){
+ const box=document.getElementById("myLoans");
+ box.textContent="Memuat...";
+ const {data,error}=await db.from("loans").select("*")
+  .eq("member_id",currentUser.id).order("created_at",{ascending:false});
+ if(error){box.textContent=error.message;return;}
+ if(!data.length){box.textContent="Belum ada riwayat pinjaman.";return;}
+ box.innerHTML="";
+ data.forEach(x=>{
+  const div=document.createElement("div");
+  div.className="item";
+  div.textContent="Rp500.000 | Status: "+x.status+
+   " | Jatuh tempo: "+x.due_date;
+  box.appendChild(div);
+ });
+}
+
+async function loadAdminLoans(){
+ const box=document.getElementById("allLoans");
+ box.textContent="Memuat...";
+ const {data,error}=await db.from("loans").select("*,profiles(full_name,member_no)")
+  .order("created_at",{ascending:false});
+ if(error){box.textContent=error.message;return;}
+ if(!data.length){box.textContent="Belum ada pengajuan.";return;}
+ box.innerHTML="";
+ data.forEach(x=>{
+  const div=document.createElement("div");
+  div.className="item";
+  const title=document.createElement("b");
+  title.textContent=(x.profiles?.full_name||"Anggota")+" — Rp500.000";
+  const info=document.createElement("p");
+  info.className="small";
+  info.textContent="Status: "+x.status+" | Tempo: "+x.due_date;
+  div.append(title,info);
+  if(x.status==="requested"){
+   const b=document.createElement("button");
+   b.textContent="SETUJUI";
+   b.onclick=()=>updateLoan(x.id,"approved");
+   div.appendChild(b);
+  }
+  if(x.status==="approved"){
+   const b=document.createElement("button");
+   b.textContent="KONFIRMASI PENCAIRAN MANUAL";
+   b.onclick=()=>updateLoan(x.id,"disbursed");
+   div.appendChild(b);
+  }
+  if(x.status==="disbursed"){
+   const b=document.createElement("button");
+   b.textContent="CATAT PEMBAYARAN DITERIMA";
+   b.onclick=()=>recordPayment(x.id);
+   div.appendChild(b);
+  }
+  box.appendChild(div);
+ });
+}
+
+async function updateLoan(id,status){
+ if(!confirm("Ubah status pinjaman menjadi "+status+"?"))return;
+ const {error}=await db.from("loans").update({status}).eq("id",id);
+ if(error){alert(error.message);return;}
+ loadAdminLoans();
+}
+
+async function recordPayment(id){
+ if(!confirm("Pastikan bendahara sudah menerima Rp500.000 secara manual. Catat pembayaran sekarang?"))return;
+ const {error}=await db.from("payments").insert({
+  loan_id:id,received_by:currentUser.id,amount:500000,method:"manual"
+ });
+ if(error){alert("Pencatatan pembayaran gagal: "+error.message);return;}
+ const {error:updateError}=await db.from("loans")
+  .update({status:"paid"}).eq("id",id);
+ if(updateError){alert("Pembayaran tercatat, tetapi status pinjaman belum berubah. Hubungi pengelola.");return;}
+ alert("Pembayaran berhasil dicatat.");
+ loadAdminLoans();
+}
+</script>
+</body>
+</html>
