@@ -65,14 +65,35 @@ button.secondary{background:#172b4d;color:white}
 </div>
 
 <div id="adminArea" class="hidden">
+
+<div class="card">
+<h2>Tambah Anggota GESA JAP</h2>
+
+<input id="newFullName" type="text"
+placeholder="Nama lengkap anggota">
+
+<input id="newUsername" type="text"
+placeholder="Username anggota">
+
+<input id="newPassword" type="password"
+placeholder="Password anggota">
+
+<button onclick="createMember()">
+TAMBAH ANGGOTA
+</button>
+
+<div id="memberMessage"></div>
+</div>
+
 <div class="card">
 <h2>Data Seluruh Pinjaman</h2>
-<button class="secondary" onclick="loadAdminLoans()">SEGARKAN DATA</button>
+<button class="secondary" onclick="loadAdminLoans()">
+SEGARKAN DATA
+</button>
 <div id="allLoans">Memuat data...</div>
 </div>
+
 </div>
-</section>
-</main>
 
 <script>
 const SUPABASE_URL = "https://fhrpqickvcofoeiqmnct.supabase.co";
@@ -116,7 +137,34 @@ async function loginUser(){
   loadMyLoans();
  }
 }
+async function createMember(){
+  const full_name = document.getElementById("newFullName").value.trim();
+  const username = document.getElementById("newUsername").value.trim().toLowerCase();
+  const password = document.getElementById("newPassword").value;
+  const msg = document.getElementById("memberMessage");
 
+  if(!full_name || !username || !password){
+    msg.textContent = "Lengkapi semua data.";
+    return;
+  }
+
+  msg.textContent = "Membuat akun...";
+
+  const {data,error} = await db.functions.invoke("admin-create-member",{
+    body:{full_name,username,password}
+  });
+
+  if(error){
+    msg.textContent = "Gagal: " + error.message;
+    return;
+  }
+
+  msg.textContent = "Anggota berhasil ditambahkan.";
+
+  document.getElementById("newFullName").value = "";
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+}
 async function logoutUser(){
  await db.auth.signOut();
  location.reload();
