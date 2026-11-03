@@ -151,7 +151,7 @@ async function createMember(){
 
   msg.textContent = "Membuat akun...";
 
-  const {data,error} = await db.functions.invoke("admin-create-member",{
+  const {data,error} = await db.functions.invoke("admin-create-member-",{
     body:{full_name,username,password}
   });
 
