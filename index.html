@@ -407,7 +407,7 @@ async function loadAdminLoans(){
   const div=document.createElement("div");
   div.className="item";
   const title=document.createElement("b");
-  title.textContent=(x.profiles?.full_name||"Anggota")+" — Rp500.000";
+  title.textContent=(x.profiles?.full_name||"Anggota")+" — "+Number(x.principal).toLocaleString("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0});
   const info=document.createElement("p");
   info.className="small";
   info.textContent="Status: "+x.status+" | Tempo: "+x.due_date;
@@ -442,7 +442,7 @@ async function updateLoan(id,status){
 }
 
 async function recordPayment(id){
- if(!confirm("Pastikan bendahara sudah menerima Rp500.000 secara manual. Catat pembayaran sekarang?"))return;
+ if(!confirm("Pastikan bendahara sudah menerima pembayaran sesuai jumlah pengembalian yang tertera"))return;
 
  const {error}=await db.rpc("record_gesa_payment",{
   p_loan_id:id
