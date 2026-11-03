@@ -53,11 +53,31 @@ button.secondary{background:#172b4d;color:white}
 <div id="memberArea" class="hidden">
 <div class="card">
 <h2>Informasi Pinjaman</h2>
-<div class="item">Pinjaman pokok <b>Rp500.000</b></div>
-<div class="item">Biaya layanan <b>Rp50.000</b></div>
-<div class="item">Dana diterima <b>Rp450.000</b></div>
-<div class="item">Pengembalian <b>Rp500.000</b></div>
-<p class="small">Pengajuan dibuka tanggal 5–25 setiap bulan. Jatuh tempo tanggal 1 bulan berikutnya.</p>
+
+<label>Pilih jumlah pinjaman</label>
+<select id="loanAmount" onchange="updateLoanInfo()">
+  <option value="100000">Rp100.000</option>
+  <option value="150000">Rp150.000</option>
+  <option value="200000">Rp200.000</option>
+  <option value="250000">Rp250.000</option>
+  <option value="300000">Rp300.000</option>
+  <option value="350000">Rp350.000</option>
+  <option value="400000">Rp400.000</option>
+  <option value="450000">Rp450.000</option>
+  <option value="500000" selected>Rp500.000</option>
+</select>
+
+<div class="item">Pinjaman pokok <b id="loanPrincipal">Rp500.000</b></div>
+<div class="item">Biaya layanan 10% <b id="loanFee">Rp50.000</b></div>
+<div class="item">Dana diterima <b id="loanNet">Rp450.000</b></div>
+<div class="item">Pengembalian <b id="loanRepayment">Rp500.000</b></div>
+
+<p class="small">
+Pengajuan dibuka tanggal 5–25 setiap bulan.
+Jatuh tempo tanggal 1 bulan berikutnya.
+Maksimal 1 pengajuan setiap bulan.
+</p>
+
 <button onclick="applyLoan()">AJUKAN PINJAMAN</button>
 </div>
 <div class="card">
@@ -243,29 +263,53 @@ function nextDueDate(){
 }
 
 async function applyLoan(){
- const now=new Date();
- if(now.getDate()<5||now.getDate()>25){
+ const now = new Date();
+
+ if(now.getDate() < 5 || now.getDate() > 25){
   alert("Pengajuan hanya dibuka tanggal 5 sampai 25 setiap bulan.");
   return;
  }
+
+ const principal = Number(document.getElementById("loanAmount").value);
+
+ if(principal < 100000 || principal > 500000 || principal % 50000 !== 0){
+  alert("Nominal pinjaman harus Rp100.000 sampai Rp500.000 dengan kelipatan Rp50.000.");
+  return;
+ }
+
  const {data:existing,error:checkError}=await db.from("loans")
-  .select("id,status").eq("member_id",currentUser.id)
+  .select("id,status")
+  .eq("member_id",currentUser.id)
   .in("status",["requested","approved","disbursed","overdue"]);
- if(checkError){alert(checkError.message);return;}
- if(existing&&existing.length){
+
+ if(checkError){
+  alert(checkError.message);
+  return;
+ }
+
+ if(existing && existing.length){
   alert("Masih ada pinjaman yang belum lunas.");
   return;
  }
+
+ const serviceFee = principal * 0.10;
+ const netDisbursed = principal - serviceFee;
+
  const {error}=await db.from("loans").insert({
   member_id:currentUser.id,
-  principal:500000,
-  service_fee:50000,
-  net_disbursed:450000,
-  repayment_amount:500000,
+  principal:principal,
+  service_fee:serviceFee,
+  net_disbursed:netDisbursed,
+  repayment_amount:principal,
   due_date:nextDueDate(),
   status:"requested"
  });
- if(error){alert("Pengajuan gagal: "+error.message);return;}
+
+ if(error){
+  alert("Pengajuan gagal: "+error.message);
+  return;
+ }
+
  alert("Pengajuan berhasil dikirim kepada bendahara.");
  loadMyLoans();
 }
@@ -590,6 +634,18 @@ function exportReportExcel(){
   XLSX.utils.book_append_sheet(book, sheet, "Laporan");
   XLSX.writeFile(book, "Laporan-GESA-JAP.xlsx");
 }
+  function updateLoanInfo(){
+  const principal = Number(document.getElementById("loanAmount").value);
+  const fee = principal * 0.10;
+  const net = principal - fee;
+
+  const rupiah = angka => "Rp" + angka.toLocaleString("id-ID");
+
+  document.getElementById("loanPrincipal").textContent = rupiah(principal);
+  document.getElementById("loanFee").textContent = rupiah(fee);
+  document.getElementById("loanNet").textContent = rupiah(net);
+  document.getElementById("loanRepayment").textContent = rupiah(principal);
+  }
 </script>
 </body>
 </html>
