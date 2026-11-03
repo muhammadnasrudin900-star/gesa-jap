@@ -231,18 +231,79 @@ async function applyLoan(){
 async function loadMyLoans(){
  const box=document.getElementById("myLoans");
  box.textContent="Memuat...";
- const {data,error}=await db.from("loans").select("*")
-  .eq("member_id",currentUser.id).order("created_at",{ascending:false});
- if(error){box.textContent=error.message;return;}
- if(!data.length){box.textContent="Belum ada riwayat pinjaman.";return;}
+
+ const {data,error}=await db.from("loans")
+  .select("*")
+  .eq("member_id",currentUser.id)
+  .order("created_at",{ascending:false});
+
+ if(error){
+  box.textContent=error.message;
+  return;
+ }
+
+ if(!data.length){
+  box.textContent="Belum ada riwayat pinjaman.";
+  return;
+ }
+
  box.innerHTML="";
- data.forEach(x=>{
+
+ const today=new Date();
+ today.setHours(0,0,0,0);
+
+ for(const x of data){
+
+  let statusText=x.status;
+
+  if(x.status!=="paid"){
+   const due=new Date(x.due_date+"T00:00:00");
+   due.setHours(0,0,0,0);
+
+   if(today > due){
+    statusText="TERLAMBAT";
+   }else if(today.getTime()===due.getTime()){
+    statusText="JATUH TEMPO";
+   }else if(x.status==="disbursed"){
+    statusText="AKTIF";
+   }
+  }else{
+   statusText="LUNAS";
+  }
+
   const div=document.createElement("div");
   div.className="item";
-  div.textContent="Rp500.000 | Status: "+x.status+
-   " | Jatuh tempo: "+x.due_date;
+
+  div.innerHTML=
+   "<b>Pinjaman Rp500.000</b><br>"+
+   "Status: <b>"+statusText+"</b><br>"+
+   "Jatuh tempo: "+x.due_date+
+   "<br><br>"+
+   "<b>Riwayat pembayaran:</b>";
+
+  const {data:payments,error:paymentError}=await db
+   .from("payments")
+   .select("amount,paid_at,method")
+   .eq("loan_id",x.id)
+   .order("paid_at",{ascending:false});
+
+  if(paymentError){
+   div.innerHTML+="<br>Gagal memuat pembayaran.";
+  }else if(!payments.length){
+   div.innerHTML+="<br>Belum ada pembayaran.";
+  }else{
+   payments.forEach(p=>{
+    const tanggal=new Date(p.paid_at).toLocaleDateString("id-ID");
+    div.innerHTML+=
+     "<br>Rp"+Number(p.amount).toLocaleString("id-ID")+
+     " — "+tanggal+
+     " — "+p.method;
+   });
+  }
+
   box.appendChild(div);
- });
+ }
+}
 }
 
 async function loadAdminLoans(){
