@@ -335,48 +335,49 @@ async function loadMyLoans(){
 
  box.innerHTML="";
 
- const today=new Date();
- today.setHours(0,0,0,0);
+ const rupiah=n=>"Rp"+Number(n||0).toLocaleString("id-ID");
 
  for(const x of data){
 
   let statusText=x.status;
 
-if(x.status==="paid"){
- statusText="LUNAS";
-}else if(x.status==="overdue"){
- statusText="TERLAMBAT";
-}else if(x.status==="disbursed"){
- const due=new Date(x.due_date+"T00:00:00");
- const today=new Date();
- today.setHours(0,0,0,0);
+  if(x.status==="paid"){
+   statusText="LUNAS";
+  }else if(x.status==="overdue"){
+   statusText="TERLAMBAT";
+  }else if(x.status==="disbursed"){
+   const due=new Date(x.due_date+"T00:00:00");
+   const today=new Date();
+   today.setHours(0,0,0,0);
 
- if(today.getTime()===due.getTime()){
-  statusText="JATUH TEMPO";
- }else{
-  statusText="AKTIF";
- }
-}else if(x.status==="approved"){
- statusText="DISETUJUI - MENUNGGU PENCAIRAN";
-}else if(x.status==="requested"){
- statusText="MENUNGGU PERSETUJUAN";
-}
+   statusText=today.getTime()===due.getTime()
+    ?"JATUH TEMPO":"AKTIF";
+  }else if(x.status==="approved"){
+   statusText="DISETUJUI - MENUNGGU PENCAIRAN";
+  }else if(x.status==="requested"){
+   statusText="MENUNGGU PERSETUJUAN";
+  }else if(x.status==="rejected"){
+   statusText="DITOLAK";
+  }
 
   const div=document.createElement("div");
   div.className="item";
 
   div.innerHTML=
-   "<b>Pinjaman Rp500.000</b><br>"+
+   "<b>Pinjaman "+rupiah(x.principal)+"</b><br>"+
+   "Biaya jasa 10%: "+rupiah(x.service_fee)+"<br>"+
+   "Dana diterima: "+rupiah(x.net_disbursed)+"<br>"+
+   "Pengembalian: "+rupiah(x.repayment_amount)+"<br>"+
    "Status: <b>"+statusText+"</b><br>"+
    "Jatuh tempo: "+x.due_date+
-   "<br><br>"+
-   "<b>Riwayat pembayaran:</b>";
+   "<br><br><b>Riwayat pembayaran:</b>";
 
   const {data:payments,error:paymentError}=await db
    .from("payments")
    .select("amount,received_at,method")
    .eq("loan_id",x.id)
    .order("received_at",{ascending:false});
+
   if(paymentError){
    div.innerHTML+="<br>Gagal memuat pembayaran.";
   }else if(!payments.length){
@@ -385,7 +386,7 @@ if(x.status==="paid"){
    payments.forEach(p=>{
     const tanggal=new Date(p.received_at).toLocaleDateString("id-ID");
     div.innerHTML+=
-     "<br>Rp"+Number(p.amount).toLocaleString("id-ID")+
+     "<br>"+rupiah(p.amount)+
      " — "+tanggal+
      " — "+p.method;
    });
