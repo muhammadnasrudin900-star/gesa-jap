@@ -288,17 +288,16 @@ if(x.status==="paid"){
 
   const {data:payments,error:paymentError}=await db
    .from("payments")
-   .select("amount,paid_at,method")
+   .select("amount,received_at,method")
    .eq("loan_id",x.id)
-   .order("paid_at",{ascending:false});
-
+   .order("received_at",{ascending:false});
   if(paymentError){
    div.innerHTML+="<br>Gagal memuat pembayaran.";
   }else if(!payments.length){
    div.innerHTML+="<br>Belum ada pembayaran.";
   }else{
    payments.forEach(p=>{
-    const tanggal=new Date(p.paid_at).toLocaleDateString("id-ID");
+    const tanggal=new Date(p.received_at).toLocaleDateString("id-ID");
     div.innerHTML+=
      "<br>Rp"+Number(p.amount).toLocaleString("id-ID")+
      " — "+tanggal+
