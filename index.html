@@ -139,6 +139,11 @@ async function loginUser(){
  }
 }
 async function createMember(){
+ if(!currentUser){
+  document.getElementById("memberMessage").textContent =
+  "Silakan login ulang sebagai bendahara.";
+  return;
+ }
   const full_name = document.getElementById("newFullName").value.trim();
   const username = document.getElementById("newUsername").value.trim().toLowerCase();
   const password = document.getElementById("newPassword").value;
