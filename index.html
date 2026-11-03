@@ -96,6 +96,19 @@ SEGARKAN DATA
   <h2>📊 LAPORAN KEUANGAN GESA JAP</h2>
 
   <p class="small">Pilih periode laporan:</p>
+  <div>
+  <button class="secondary" onclick="setReportPeriod('week')">
+    MINGGU INI
+  </button>
+
+  <button class="secondary" onclick="setReportPeriod('month')">
+    BULAN INI
+  </button>
+
+  <button class="secondary" onclick="setReportPeriod('year')">
+    TAHUN INI
+  </button>
+  </div>
 
   <label>Dari tanggal</label>
   <input type="date" id="reportStart">
@@ -387,6 +400,44 @@ async function recordPayment(id){
  alert("Pembayaran berhasil dicatat. Status pinjaman LUNAS.");
  await loadAdminLoans();
 }
+function setReportPeriod(type){
+  const now = new Date();
+
+  const formatDate = (date) =>
+    date.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Jakarta"
+    });
+
+  let start;
+  let end;
+
+  if(type === "week"){
+    const day = now.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+
+    start = new Date(now);
+    start.setDate(now.getDate() + diff);
+
+    end = new Date(start);
+    end.setDate(start.getDate() + 6);
+  }
+
+  if(type === "month"){
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+    end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  }
+
+  if(type === "year"){
+    start = new Date(now.getFullYear(), 0, 1);
+    end = new Date(now.getFullYear(), 11, 31);
+  }
+
+  document.getElementById("reportStart").value = formatDate(start);
+  document.getElementById("reportEnd").value = formatDate(end);
+
+  loadFinancialReport();
+}
+  
   async function loadFinancialReport(){
   const box = document.getElementById("financialReport");
   const start = document.getElementById("reportStart").value;
