@@ -92,7 +92,25 @@ SEGARKAN DATA
 </button>
 <div id="allLoans">Memuat data...</div>
 </div>
+<div class="card">
+  <h2>📊 LAPORAN KEUANGAN GESA JAP</h2>
 
+  <p class="small">Pilih periode laporan:</p>
+
+  <label>Dari tanggal</label>
+  <input type="date" id="reportStart">
+
+  <label>Sampai tanggal</label>
+  <input type="date" id="reportEnd">
+
+  <button onclick="loadFinancialReport()">
+    TAMPILKAN LAPORAN
+  </button>
+
+  <div id="financialReport">
+    Belum ada laporan yang ditampilkan.
+  </div>
+</div>
 </div>
 
 <script>
