@@ -74,7 +74,28 @@ main{max-width:520px;margin:22px auto;padding:15px}
 h2{margin-top:0;color:#17243c}
 input,button{width:100%;padding:13px;margin:7px 0;border-radius:8px;font-size:15px}
 input{border:1px solid #ccd2dc}
-button{border:0;background:#c69b43;color:#17243c;font-weight:bold;cursor:pointer}
+button{
+  border:1px solid #d9b45e;
+  background:linear-gradient(135deg,#101d38,#1d355e);
+  color:#f0cd78;
+  font-weight:800;
+  cursor:pointer;
+  padding:12px 20px;
+  border-radius:9px;
+  letter-spacing:.5px;
+  box-shadow:0 3px 8px rgba(16,29,56,.22);
+  transition:all .2s ease;
+}
+
+button:hover{
+  background:linear-gradient(135deg,#c69b43,#e6bd63);
+  color:#101d38;
+  transform:translateY(-1px);
+}
+
+button:active{
+  transform:scale(.98);
+}
 button.secondary{background:#172b4d;color:white}
 .small{font-size:13px;color:#667085}
 .hidden{display:none}
