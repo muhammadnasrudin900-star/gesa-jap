@@ -25,6 +25,8 @@ button.secondary{background:#172b4d;color:white}
 .amount{font-size:22px;font-weight:bold;color:#a47a27}
 #message{white-space:pre-wrap;font-size:13px;color:#a12b2b}
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <header>
@@ -119,6 +121,15 @@ SEGARKAN DATA
   <button onclick="loadFinancialReport()">
     TAMPILKAN LAPORAN
   </button>
+  <div style="margin-top:12px;">
+  <button class="secondary" onclick="exportReportPDF()">
+    UNDUH LAPORAN PDF
+  </button>
+
+  <button class="secondary" onclick="exportReportExcel()">
+    UNDUH LAPORAN EXCEL
+  </button>
+  </div>
 
   <div id="financialReport">
     Belum ada laporan yang ditampilkan.
@@ -498,6 +509,83 @@ function setReportPeriod(type){
     <p>Jumlah terlambat: <b>${selectedLoans.filter(x => x.status === "overdue").length}</b></p>
   `;
   }
+  function exportReportPDF(){
+  const box = document.getElementById("financialReport");
+
+  if(box.textContent.includes("Belum ada laporan") ||
+     box.textContent.includes("Memuat laporan")){
+    alert("Tampilkan laporan terlebih dahulu.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFillColor(15, 35, 65);
+  doc.rect(0, 0, 210, 35, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("GESA JAP", 15, 16);
+
+  doc.setFontSize(11);
+  doc.text("LAPORAN KEUANGAN", 15, 25);
+
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(2);
+  doc.line(15, 40, 195, 40);
+
+  doc.setTextColor(30, 30, 30);
+  doc.setFontSize(11);
+
+  const start = document.getElementById("reportStart").value;
+  const end = document.getElementById("reportEnd").value;
+
+  doc.text("Periode: " + start + " sampai " + end, 15, 52);
+
+  const lines = box.innerText.split("\n").filter(x => x.trim());
+
+  let y = 68;
+  lines.forEach(line => {
+    doc.text(line, 15, y);
+    y += 10;
+  });
+
+  doc.save("Laporan-GESA-JAP.pdf");
+}
+
+function exportReportExcel(){
+  const box = document.getElementById("financialReport");
+
+  if(box.textContent.includes("Belum ada laporan") ||
+     box.textContent.includes("Memuat laporan")){
+    alert("Tampilkan laporan terlebih dahulu.");
+    return;
+  }
+
+  const start = document.getElementById("reportStart").value;
+  const end = document.getElementById("reportEnd").value;
+
+  const lines = box.innerText.split("\n").filter(x => x.trim());
+
+  const rows = [
+    ["GESA JAP - LAPORAN KEUANGAN"],
+    ["Periode", start + " sampai " + end],
+    [],
+    ["Keterangan", "Nilai"]
+  ];
+
+  lines.forEach(line => {
+    const parts = line.split(":");
+    rows.push([parts[0].trim(), parts.slice(1).join(":").trim()]);
+  });
+
+  const sheet = XLSX.utils.aoa_to_sheet(rows);
+  const book = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(book, sheet, "Laporan");
+  XLSX.writeFile(book, "Laporan-GESA-JAP.xlsx");
+}
 </script>
 </body>
 </html>
