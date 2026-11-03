@@ -387,6 +387,66 @@ async function recordPayment(id){
  alert("Pembayaran berhasil dicatat. Status pinjaman LUNAS.");
  await loadAdminLoans();
 }
+  async function loadFinancialReport(){
+  const box = document.getElementById("financialReport");
+  const start = document.getElementById("reportStart").value;
+  const end = document.getElementById("reportEnd").value;
+
+  if (!currentProfile || currentProfile.role !== "admin"){
+    alert("Hanya bendahara yang boleh melihat laporan.");
+    return;
+  }
+
+  if (!start || !end || start > end){
+    alert("Pilih periode tanggal yang benar.");
+    return;
+  }
+
+  box.textContent = "Memuat laporan...";
+
+  const {data: loans, error: loanError} = await db
+    .from("loans")
+    .select("principal,service_fee,net_disbursed,status,created_at");
+
+  if (loanError){
+    box.textContent = "Gagal mengambil pinjaman: " + loanError.message;
+    return;
+  }
+
+  const {data: payments, error: paymentError} = await db
+    .from("payments")
+    .select("amount,received_at");
+
+  if (paymentError){
+    box.textContent = "Gagal mengambil pembayaran: " + paymentError.message;
+    return;
+  }
+
+  const inPeriod = (value) => {
+    if (!value) return false;
+    const d = new Date(value);
+    const localDate = new Date(d.getTime() + 7 * 60 * 60 * 1000)
+      .toISOString().slice(0,10);
+    return localDate >= start && localDate <= end;
+  };
+
+  const selectedLoans = loans.filter(x => inPeriod(x.created_at));
+  const selectedPayments = payments.filter(x => inPeriod(x.received_at));
+
+  const sum = (arr, key) => arr.reduce((n,x) => n + Number(x[key] || 0), 0);
+  const rupiah = n => "Rp" + Number(n).toLocaleString("id-ID");
+
+  box.innerHTML = `
+    <p>Total pokok pinjaman: <b>${rupiah(sum(selectedLoans,"principal"))}</b></p>
+    <p>Total biaya jasa: <b>${rupiah(sum(selectedLoans,"service_fee"))}</b></p>
+    <p>Total pencairan: <b>${rupiah(sum(selectedLoans,"net_disbursed"))}</b></p>
+    <p>Total pembayaran: <b>${rupiah(sum(selectedPayments,"amount"))}</b></p>
+    <p>Jumlah pengajuan: <b>${selectedLoans.length}</b></p>
+    <p>Jumlah dicairkan: <b>${selectedLoans.filter(x => ["disbursed","paid","overdue"].includes(x.status)).length}</b></p>
+    <p>Jumlah lunas: <b>${selectedLoans.filter(x => x.status === "paid").length}</b></p>
+    <p>Jumlah terlambat: <b>${selectedLoans.filter(x => x.status === "overdue").length}</b></p>
+  `;
+  }
 </script>
 </body>
 </html>
