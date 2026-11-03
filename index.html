@@ -137,28 +137,20 @@ async function loginUser(){
   document.getElementById("memberArea").classList.remove("hidden");
   loadMyLoans();
  }
-}
 async function createMember(){
- if(!currentUser){
-  document.getElementById("memberMessage").textContent =
-  "Silakan login ulang sebagai bendahara.";
-  return;
- }
   const full_name = document.getElementById("newFullName").value.trim();
   const username = document.getElementById("newUsername").value.trim().toLowerCase();
   const password = document.getElementById("newPassword").value;
   const msg = document.getElementById("memberMessage");
 
-  if(error){
-  let detail = error.message;
+  if(!currentUser){
+    msg.textContent = "Silakan login ulang sebagai bendahara.";
+    return;
+  }
 
-  try {
-    const response = await error.context.clone().json();
-    detail = JSON.stringify(response);
-  } catch(e) {}
-
-  msg.textContent = "Gagal: " + detail;
-  return;
+  if(!full_name || !username || !password){
+    msg.textContent = "Lengkapi semua data.";
+    return;
   }
 
   msg.textContent = "Membuat akun...";
@@ -168,17 +160,21 @@ async function createMember(){
   });
 
   if(error){
-    msg.textContent = "Gagal: " + error.message;
+    let detail = error.message;
+    try {
+      const response = await error.context.clone().json();
+      detail = JSON.stringify(response);
+    } catch(e) {}
+    msg.textContent = "Gagal: " + detail;
     return;
   }
 
   msg.textContent = "Anggota berhasil ditambahkan.";
-
   document.getElementById("newFullName").value = "";
   document.getElementById("newUsername").value = "";
   document.getElementById("newPassword").value = "";
 }
-async function logoutUser(){
+ async function logoutUser(){
  await db.auth.signOut();
  location.reload();
 }
