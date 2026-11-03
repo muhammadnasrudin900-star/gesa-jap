@@ -554,7 +554,14 @@ async function loadAdminLoans(){
 "Biaya jasa: Rp"+Number(x.service_fee).toLocaleString("id-ID")+
 " | Dana diterima: Rp"+Number(x.net_disbursed).toLocaleString("id-ID")+
 " | Pengembalian: Rp"+Number(x.repayment_amount).toLocaleString("id-ID")+
-" | Status: "+x.status+
+" | Status: "+(
+  x.status==="paid" ? "🟢 LUNAS" :
+  x.status==="overdue" ? "🔴 TERLAMBAT" :
+  x.status==="requested" ? "🟡 MENUNGGU PERSETUJUAN" :
+  x.status==="approved" ? "🔵 DISETUJUI" :
+  x.status==="disbursed" ? "🟠 SUDAH CAIR" :
+  x.status
+)+
 " | Tempo: "+x.due_date;
   div.append(title,info);
   if(x.status==="requested"){
