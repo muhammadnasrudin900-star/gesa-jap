@@ -356,15 +356,18 @@ async function updateLoan(id,status){
 
 async function recordPayment(id){
  if(!confirm("Pastikan bendahara sudah menerima Rp500.000 secara manual. Catat pembayaran sekarang?"))return;
- const {error}=await db.from("payments").insert({
-  loan_id:id,received_by:currentUser.id,amount:500000,method:"manual"
+
+ const {error}=await db.rpc("record_gesa_payment",{
+  p_loan_id:id
  });
- if(error){alert("Pencatatan pembayaran gagal: "+error.message);return;}
- const {error:updateError}=await db.from("loans")
-  .update({status:"paid"}).eq("id",id);
- if(updateError){alert("Pembayaran tercatat, tetapi status pinjaman belum berubah. Hubungi pengelola.");return;}
- alert("Pembayaran berhasil dicatat.");
- loadAdminLoans();
+
+ if(error){
+  alert("Pencatatan pembayaran gagal: "+error.message);
+  return;
+ }
+
+ alert("Pembayaran berhasil dicatat. Status pinjaman LUNAS.");
+ await loadAdminLoans();
 }
 </script>
 </body>
