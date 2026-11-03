@@ -137,8 +137,8 @@ async function loginUser(){
   document.getElementById("memberArea").classList.remove("hidden");
   loadMyLoans();
  }
- 
-async function createMember(){
+}
+ async function createMember(){
   const full_name = document.getElementById("newFullName").value.trim();
   const username = document.getElementById("newUsername").value.trim().toLowerCase();
   const password = document.getElementById("newPassword").value;
