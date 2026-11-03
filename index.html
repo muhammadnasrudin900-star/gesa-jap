@@ -256,20 +256,25 @@ async function loadMyLoans(){
 
   let statusText=x.status;
 
-  if(x.status!=="paid"){
-   const due=new Date(x.due_date+"T00:00:00");
-   due.setHours(0,0,0,0);
+if(x.status==="paid"){
+ statusText="LUNAS";
+}else if(x.status==="overdue"){
+ statusText="TERLAMBAT";
+}else if(x.status==="disbursed"){
+ const due=new Date(x.due_date+"T00:00:00");
+ const today=new Date();
+ today.setHours(0,0,0,0);
 
-   if(today > due){
-    statusText="TERLAMBAT";
-   }else if(today.getTime()===due.getTime()){
-    statusText="JATUH TEMPO";
-   }else if(x.status==="disbursed"){
-    statusText="AKTIF";
-   }
-  }else{
-   statusText="LUNAS";
-  }
+ if(today.getTime()===due.getTime()){
+  statusText="JATUH TEMPO";
+ }else{
+  statusText="AKTIF";
+ }
+}else if(x.status==="approved"){
+ statusText="DISETUJUI - MENUNGGU PENCAIRAN";
+}else if(x.status==="requested"){
+ statusText="MENUNGGU PERSETUJUAN";
+}
 
   const div=document.createElement("div");
   div.className="item";
