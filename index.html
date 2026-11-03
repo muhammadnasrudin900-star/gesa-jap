@@ -517,7 +517,10 @@ function setReportPeriod(type){
     alert("Tampilkan laporan terlebih dahulu.");
     return;
   }
-
+if (!window.jspdf) {
+  alert("Pustaka PDF belum berhasil dimuat. Periksa koneksi internet lalu muat ulang aplikasi.");
+  return;
+}
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
