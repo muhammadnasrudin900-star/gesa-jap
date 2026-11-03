@@ -337,12 +337,12 @@ async function loadAdminLoans(){
    b.onclick=()=>updateLoan(x.id,"disbursed");
    div.appendChild(b);
   }
-  if(x.status==="disbursed"){
+  if(x.status==="disbursed" || x.status==="overdue"){
    const b=document.createElement("button");
    b.textContent="CATAT PEMBAYARAN DITERIMA";
    b.onclick=()=>recordPayment(x.id);
    div.appendChild(b);
-  }
+}
   box.appendChild(div);
  });
 }
