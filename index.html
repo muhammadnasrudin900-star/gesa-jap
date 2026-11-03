@@ -410,7 +410,12 @@ async function loadAdminLoans(){
   title.textContent=(x.profiles?.full_name||"Anggota")+" — "+Number(x.principal).toLocaleString("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0});
   const info=document.createElement("p");
   info.className="small";
-  info.textContent="Status: "+x.status+" | Tempo: "+x.due_date;
+  info.textContent=
+"Biaya jasa: Rp"+Number(x.service_fee).toLocaleString("id-ID")+
+" | Dana diterima: Rp"+Number(x.net_disbursed).toLocaleString("id-ID")+
+" | Pengembalian: Rp"+Number(x.repayment_amount).toLocaleString("id-ID")+
+" | Status: "+x.status+
+" | Tempo: "+x.due_date;
   div.append(title,info);
   if(x.status==="requested"){
    const b=document.createElement("button");
