@@ -137,6 +137,7 @@ async function loginUser(){
   document.getElementById("memberArea").classList.remove("hidden");
   loadMyLoans();
  }
+ 
 async function createMember(){
   const full_name = document.getElementById("newFullName").value.trim();
   const username = document.getElementById("newUsername").value.trim().toLowerCase();
@@ -174,6 +175,7 @@ async function createMember(){
   document.getElementById("newUsername").value = "";
   document.getElementById("newPassword").value = "";
 }
+ 
  async function logoutUser(){
  await db.auth.signOut();
  location.reload();
