@@ -155,9 +155,22 @@ async function loginUser(){
   }
 
   msg.textContent = "Membuat akun...";
+  const {data:members,error:membersError} = await db
+  .from("profiles")
+  .select("member_no")
+  .not("member_no","is",null)
+  .order("member_no",{ascending:false})
+  .limit(1);
+
+if(membersError){
+  msg.textContent = "Gagal membaca nomor anggota.";
+  return;
+}
+
+const member_no = members.length ? members[0].member_no + 1 : 1;
 
   const {data,error} = await db.functions.invoke("admin-create-member-",{
-    body:{full_name,username,password}
+    body:{full_name,username,password,member_no}
   });
 
   if(error){
