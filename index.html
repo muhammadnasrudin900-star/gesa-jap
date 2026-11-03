@@ -149,9 +149,16 @@ async function createMember(){
   const password = document.getElementById("newPassword").value;
   const msg = document.getElementById("memberMessage");
 
-  if(!full_name || !username || !password){
-    msg.textContent = "Lengkapi semua data.";
-    return;
+  if(error){
+  let detail = error.message;
+
+  try {
+    const response = await error.context.clone().json();
+    detail = JSON.stringify(response);
+  } catch(e) {}
+
+  msg.textContent = "Gagal: " + detail;
+  return;
   }
 
   msg.textContent = "Membuat akun...";
