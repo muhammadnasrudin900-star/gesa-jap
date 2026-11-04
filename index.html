@@ -940,6 +940,63 @@ function exportReportExcel(){
   modal.querySelector("#uploadProfilePhoto").onclick =
     uploadProfilePhoto;
 }
+  async function uploadProfilePhoto(){
+  const input = document.getElementById("profilePhotoInput");
+  const file = input.files[0];
+
+  if(!file){
+    alert("Pilih foto terlebih dahulu.");
+    return;
+  }
+
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+    alert("Gunakan foto JPG, PNG, atau WEBP.");
+    return;
+  }
+
+  if(file.size > 2 * 1024 * 1024){
+    alert("Ukuran foto maksimal 2 MB.");
+    return;
+  }
+
+  const userId = currentUser.id;
+  const filePath = userId + "/" + Date.now() + "." +
+    file.name.split(".").pop().toLowerCase();
+
+  const {error: uploadError} = await db.storage
+    .from("profile-photos")
+    .upload(filePath, file, {
+      contentType:file.type,
+      upsert:false
+    });
+
+  if(uploadError){
+    alert("Gagal mengunggah foto: " + uploadError.message);
+    return;
+  }
+
+  const {data} = db.storage
+    .from("profile-photos")
+    .getPublicUrl(filePath);
+
+  const photoUrl = data.publicUrl;
+
+  const {error:updateError} = await db
+    .from("profiles")
+    .update({avatar_url:photoUrl})
+    .eq("id", userId);
+
+  if(updateError){
+    alert("Foto terunggah, tetapi profil gagal diperbarui: " +
+      updateError.message);
+    return;
+  }
+
+  currentProfile.avatar_url = photoUrl;
+
+  alert("Foto profil berhasil diperbarui.");
+  openProfile();
+  }
 
 function openSettings(){
   alert("Menu Pengaturan GESA JAP sedang disiapkan.");
