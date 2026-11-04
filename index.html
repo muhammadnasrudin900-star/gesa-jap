@@ -940,6 +940,28 @@ function exportReportExcel(){
   document.body.appendChild(modal);
 
   modal.querySelector("#closeProfile").onclick = () => modal.remove();
+    modal.querySelector("#saveProfileName").onclick = async () => {
+  const newName = document.getElementById("editProfileName").value.trim();
+
+  if(newName.length < 3){
+    alert("Nama minimal 3 karakter.");
+    return;
+  }
+
+  const {error} = await db
+    .from("profiles")
+    .update({full_name:newName})
+    .eq("id", currentUser.id);
+
+  if(error){
+    alert("Gagal menyimpan nama: " + error.message);
+    return;
+  }
+
+  currentProfile.full_name = newName;
+  alert("Nama profil berhasil diperbarui.");
+  openProfile();
+};
 
   modal.querySelector("#uploadProfilePhoto").onclick =
     uploadProfilePhoto;
