@@ -1,0 +1,19 @@
+{
+  "name": "GESA JAP - Sistem Pinjaman Anggota",
+  "short_name": "GESA JAP",
+  "description": "Sistem Pinjaman Anggota GESA JAP",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071629",
+  "theme_color": "#071629",
+  "icons": [
+    {
+      "src": "./gesa-jap-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
