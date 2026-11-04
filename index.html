@@ -1128,6 +1128,10 @@ function openSettings(){
   modal.querySelector("#closeSettings").onclick =
     () => modal.remove();
 }
+modal.querySelector("#logoutFromSettings").onclick = async () => {
+  if(!confirm("Apakah Anda yakin ingin keluar dari akun GESA JAP?")) return;
+  await logoutUser();
+};
 </script>
 </body>
 </html>
