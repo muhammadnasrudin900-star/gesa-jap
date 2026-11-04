@@ -1266,6 +1266,22 @@ function openSettings(){
     await logoutUser();
   };
 }
+  window.saveGesaPushToken = async function(token) {
+  if (!currentUser || !currentUser.id) {
+    throw new Error("Silakan login terlebih dahulu.");
+  }
+
+  const { error } = await db
+    .from("push_subscriptions")
+    .upsert({
+      user_id: currentUser.id,
+      token: token
+    }, {
+      onConflict: "token"
+    });
+
+  if (error) throw error;
+};
  </script>
 <script>
 if ("serviceWorker" in navigator) {
