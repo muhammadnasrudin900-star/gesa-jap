@@ -249,7 +249,7 @@ button.secondary:hover{
 <p class="small">Masuk menggunakan username dan password.</p>
 <input id="username" placeholder="Username" autocomplete="username">
 <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-<button type="button" onclick="alert('TOMBOL LOGIN BERFUNGSI'); loginUser()">MASUK</button>
+<button type="button" onclick="loginUser()">MASUK</button>
 <div id="message"></div>
 </section>
 
@@ -433,10 +433,7 @@ async function loginUser(){
  const {data,error}=await db.auth.signInWithPassword({
   email:u+"@gesajap.invalid",password:p
  });
- if(error){
-  alert("LOGIN GAGAL: "+error.message);
-  showMessage("Login gagal: "+error.message);
-  return;
+ if(error){showMessage("Login gagal: "+error.message);return;}
 }
  currentUser=data.user;
  const {data:profile,error:pe}=await db.from("profiles")
