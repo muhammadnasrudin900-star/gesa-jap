@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="512" height="512"
+     viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#071629"/>
+  <image
+    xlink:href="./gesa-jap-logo.jpg"
+    x="0" y="50"
+    width="512" height="412"
+    preserveAspectRatio="xMidYMid meet"/>
+</svg>
