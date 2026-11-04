@@ -1244,6 +1244,11 @@ function openSettings(){
       <p><b>📱 INFORMASI APLIKASI</b><br>
       GESA JAP - Sistem Pinjaman Anggota</p>
 
+      <button id="enablePush"
+  style="width:100%;margin-top:15px;background:#c69b43;color:#101d38;">
+  🔔 AKTIFKAN NOTIFIKASI HP
+</button>
+
       <button id="logoutFromSettings"
         style="width:100%;margin-top:15px;background:#a12b2b;color:white;">
         🚪 KELUAR AKUN
@@ -1257,6 +1262,14 @@ function openSettings(){
   `;
 
   document.body.appendChild(modal);
+
+  modal.querySelector("#enablePush").onclick = async () => {
+  try {
+    await window.enableGesaPushNotifications();
+  } catch (error) {
+    alert("Notifikasi gagal diaktifkan: " + error.message);
+  }
+};
 
   modal.querySelector("#closeSettings").onclick =
     () => modal.remove();
