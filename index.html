@@ -263,7 +263,16 @@ button.secondary:hover{
   </div>
   </div>
   <div class="card">
-  <h2>🔔 NOTIFIKASI GESA JAP</h2>
+  <h2>
+  🔔 NOTIFIKASI GESA JAP
+  <span id="unreadCount" style="
+    background:#a12b2b;
+    color:white;
+    padding:4px 9px;
+    border-radius:20px;
+    font-size:12px;
+  ">0 BARU</span>
+</h2>
   <div id="notificationList">
     <p>Memuat notifikasi...</p>
   </div>
@@ -691,6 +700,14 @@ async function loadMyLoans(){
     box.textContent="Gagal memuat notifikasi: "+error.message;
     return;
   }
+  const unread=data.filter(n=>!n.is_read).length;
+
+const badge=document.getElementById("unreadCount");
+
+if(badge){
+  badge.textContent=unread+" BARU";
+  badge.style.display=unread>0?"inline-block":"none";
+}
 
   if(!data.length){
     box.textContent="Belum ada notifikasi.";
