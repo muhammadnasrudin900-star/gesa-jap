@@ -941,6 +941,34 @@ function exportReportExcel(){
   document.body.appendChild(modal);
 
   modal.querySelector("#closeProfile").onclick = () => modal.remove();
+    modal.querySelector("#changePassword").onclick = async () => {
+  const newPassword = prompt("Masukkan password baru (minimal 10 karakter):");
+
+  if(newPassword === null) return;
+
+  if(newPassword.length < 10){
+    alert("Password minimal 10 karakter.");
+    return;
+  }
+
+  const confirmPassword = prompt("Ulangi password baru:");
+
+  if(confirmPassword !== newPassword){
+    alert("Password tidak sama. Silakan ulangi.");
+    return;
+  }
+
+  const {error} = await db.auth.updateUser({
+    password:newPassword
+  });
+
+  if(error){
+    alert("Gagal mengganti password: " + error.message);
+    return;
+  }
+
+  alert("Password berhasil diganti.");
+};
     modal.querySelector("#saveProfileName").onclick = async () => {
   const newName = document.getElementById("editProfileName").value.trim();
 
