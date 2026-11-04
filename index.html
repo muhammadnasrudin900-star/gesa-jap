@@ -883,8 +883,19 @@ function exportReportExcel(){
   document.getElementById("loanNet").textContent = rupiah(net);
   document.getElementById("loanRepayment").textContent = rupiah(principal);
   }
-  function openProfile(){
-  alert("Menu Profil GESA JAP sedang disiapkan.");
+  async function openProfile(){
+  if(!currentProfile){
+    alert("Data profil belum tersedia. Silakan login ulang.");
+    return;
+  }
+
+  alert(
+    "PROFIL GESA JAP\n\n"+
+    "Nama: "+(currentProfile.full_name || "-")+"\n"+
+    "Username: "+(currentProfile.username || "-")+"\n"+
+    "Nomor Anggota: "+(currentProfile.member_no || "-")+"\n"+
+    "Jabatan: "+(currentProfile.role === "admin" ? "Bendahara" : "Anggota")
+  );
 }
 
 function openSettings(){
