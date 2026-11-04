@@ -1083,55 +1083,40 @@ function openSettings(){
       max-height:90vh;
       overflow-y:auto;
     ">
-      <h2 style="text-align:center;color:#101d38;">
-        ⚙️ PENGATURAN GESA JAP
-      </h2>
-
-      <div style="padding:14px;border-bottom:1px solid #e6bd63;">
-        <b>📅 JADWAL PENGAJUAN</b>
-        <p>Pengajuan dibuka tanggal 5 sampai 25 setiap bulan.</p>
-      </div>
-
-      <div style="padding:14px;border-bottom:1px solid #e6bd63;">
-        <b>💰 BIAYA JASA</b>
-        <p>Biaya jasa sebesar 10% dari jumlah pinjaman.</p>
-      </div>
-
-      <div style="padding:14px;border-bottom:1px solid #e6bd63;">
-        <b>💳 NOMINAL PINJAMAN</b>
-        <p>Rp100.000 sampai Rp500.000 dengan kelipatan Rp50.000.</p>
-      </div>
-
-      <div style="padding:14px;border-bottom:1px solid #e6bd63;">
-        <b>⏰ JATUH TEMPO</b>
-        <p>Pengembalian dilakukan tanggal 1 bulan berikutnya. Terlambat mulai tanggal 2.</p>
-      </div>
-
-      <div style="padding:14px;border-bottom:1px solid #e6bd63;">
-        <b>📱 INFORMASI APLIKASI</b>
-        <p>GESA JAP<br>Sistem Pinjaman Anggota</p>
-      </div>
+      <h2>⚙️ PENGATURAN GESA JAP</h2>
+      <p><b>📅 JADWAL PENGAJUAN</b><br>
+      Tanggal 5 sampai 25 setiap bulan.</p>
+      <p><b>💰 BIAYA JASA</b><br>
+      10% dari jumlah pinjaman.</p>
+      <p><b>💳 NOMINAL PINJAMAN</b><br>
+      Rp100.000 sampai Rp500.000.</p>
+      <p><b>⏰ JATUH TEMPO</b><br>
+      Tanggal 1 bulan berikutnya.</p>
+      <p><b>📱 INFORMASI APLIKASI</b><br>
+      GESA JAP - Sistem Pinjaman Anggota</p>
 
       <button id="logoutFromSettings"
-  style="width:100%;margin-top:15px;background:#a12b2b;color:white;">
-  🚪 KELUAR AKUN
-</button>
+        style="width:100%;margin-top:15px;background:#a12b2b;color:white;">
+        🚪 KELUAR AKUN
+      </button>
 
-<button class="secondary" id="closeSettings"
-  style="width:100%;margin-top:10px;">
-  TUTUP PENGATURAN
-</button>
-</div>
+      <button class="secondary" id="closeSettings"
+        style="width:100%;margin-top:10px;">
+        TUTUP PENGATURAN
+      </button>
+    </div>
+  `;
 
   document.body.appendChild(modal);
 
   modal.querySelector("#closeSettings").onclick =
     () => modal.remove();
+
+  modal.querySelector("#logoutFromSettings").onclick = async () => {
+    if(!confirm("Yakin ingin keluar dari akun GESA JAP?")) return;
+    await logoutUser();
+  };
 }
-modal.querySelector("#logoutFromSettings").onclick = async () => {
-  if(!confirm("Apakah Anda yakin ingin keluar dari akun GESA JAP?")) return;
-  await logoutUser();
-};
 </script>
 </body>
 </html>
