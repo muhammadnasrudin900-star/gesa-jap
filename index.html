@@ -434,7 +434,6 @@ async function loginUser(){
   email:u+"@gesajap.invalid",password:p
  });
  if(error){showMessage("Login gagal: "+error.message);return;}
-}
  currentUser=data.user;
  const {data:profile,error:pe}=await db.from("profiles")
   .select("*").eq("id",currentUser.id).single();
