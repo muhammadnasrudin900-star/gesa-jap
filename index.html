@@ -1266,6 +1266,14 @@ function openSettings(){
     await logoutUser();
   };
 }
+ <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("GESA JAP siap dipasang"))
+      .catch(error => console.error("Service Worker gagal:", error));
+  });
+}
 </script>
 </body>
 </html>
