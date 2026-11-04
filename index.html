@@ -919,7 +919,11 @@ function exportReportExcel(){
         border-radius:50%;border:3px solid #c69b43;">
 
       <div style="margin:15px 0;text-align:left;">
-        <b>Nama:</b> ${currentProfile.full_name || "-"}<br><br>
+        <label>Nama Lengkap</label>
+<input id="editProfileName"
+  value="${(currentProfile.full_name || "").replace(/"/g, "&quot;")}">
+<button id="saveProfileName">SIMPAN NAMA</button>
+<br><br>
         <b>Username:</b> ${currentProfile.username || "-"}<br><br>
         <b>Nomor Anggota:</b> ${currentProfile.member_no || "-"}<br><br>
         <b>Jabatan:</b> ${currentProfile.role === "admin" ? "Bendahara" : "Anggota"}
