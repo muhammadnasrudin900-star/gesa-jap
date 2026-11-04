@@ -457,8 +457,10 @@ async function loginUser(){
   loadMyLoans();
    loadNotifications();
  }
+}
   async function loadAdminNotifications(){
   const box=document.getElementById("adminNotificationList");
+  if(!box) return;
 
   box.textContent="Memuat notifikasi anggota...";
 
@@ -482,7 +484,6 @@ async function loginUser(){
   data.forEach(n=>{
     const div=document.createElement("div");
     div.className="item";
-
     const nama=n.profiles?.full_name||"Anggota";
     const nomor=n.profiles?.member_no||"-";
 
@@ -494,8 +495,7 @@ async function loginUser(){
 
     box.appendChild(div);
   });
-}
-}
+  }
  async function createMember(){
   const full_name = document.getElementById("newFullName").value.trim();
   const username = document.getElementById("newUsername").value.trim().toLowerCase();
