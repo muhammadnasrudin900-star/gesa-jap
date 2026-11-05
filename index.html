@@ -489,41 +489,62 @@ function showMessage(t){
  document.getElementById("message").textContent=t;
 }
 
+
 async function loginUser(){
- const u=document.getElementById("username").value.trim().toLowerCase();
- const p=document.getElementById("password").value;
- if(!u||!p){showMessage("Isi username dan password.");return;}
- showMessage("Memeriksa akun...");
- const {data,error}=await db.auth.signInWithPassword({
-  email:u+"@gesajap.invalid",password:p
- });
- if(error){showMessage("Login gagal: "+error.message);return;}
- currentUser=data.user;
- const {data:profile,error:pe}=await db.from("profiles")
-  .select("*").eq("id",currentUser.id).single();
- if(pe||!profile){
-  await db.auth.signOut();
-  showMessage("Profil akun tidak ditemukan. Hubungi bendahara.");
-  return;
- }
- currentProfile=profile;
- document.getElementById("login").classList.add("hidden");
- document.getElementById("dashboard").classList.remove("hidden");
- document.getElementById("welcome").textContent="Halo, "+profile.full_name;
- document.getElementById("roleText").textContent=
-  profile.role==="admin"?"Bendahara GESA JAP":"Anggota GESA JAP";
-if(profile.role==="admin"){
-  document.getElementById("adminArea").classList.remove("hidden");
-  loadAdminLoans();
-  loadAdminNotifications();
-  loadPushTargets();
+  const u = document.getElementById("username").value.trim().toLowerCase();
+  const p = document.getElementById("password").value;
+
+  if(!u || !p){
+    showMessage("Isi username dan password.");
+    return;
+  }
+
+  showMessage("Memeriksa akun...");
+
+  const {data, error} = await db.auth.signInWithPassword({
+    email: u + "@gesajap.invalid",
+    password: p
+  });
+
+  if(error){
+    showMessage("Login gagal: " + error.message);
+    return;
+  }
+
+  currentUser = data.user;
+
+  const {data: profile, error: pe} = await db
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
+
+  if(pe || !profile){
+    await db.auth.signOut();
+    showMessage("Profil akun tidak ditemukan. Hubungi bendahara.");
+    return;
+  }
+
+  currentProfile = profile;
+
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("welcome").textContent = "Halo, " + profile.full_name;
+
+  document.getElementById("roleText").textContent =
+    profile.role === "admin" ? "Bendahara GESA JAP" : "Anggota GESA JAP";
+
+  if(profile.role === "admin"){
+    document.getElementById("adminArea").classList.remove("hidden");
+    loadAdminLoans();
+    loadAdminNotifications();
+  } else {
+    document.getElementById("memberArea").classList.remove("hidden");
+    loadMyLoans();
+    loadNotifications();
+  }
 }
- }else{
-  document.getElementById("memberArea").classList.remove("hidden");
-  loadMyLoans();
-   loadNotifications();
- }
-}
+
   async function loadAdminNotifications(){
   const box=document.getElementById("adminNotificationList");
   if(!box) return;
