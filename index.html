@@ -1367,6 +1367,8 @@ async function loadPushTargets() {
   const status = document.getElementById("pushStatus");
 
   if (!select) return;
+  alert("Fungsi daftar anggota dijalankan!");
+status.textContent = "Sedang mengambil data anggota...";
 
   if (status) status.textContent = "Memuat daftar anggota...";
 
