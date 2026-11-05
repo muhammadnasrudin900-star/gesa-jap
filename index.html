@@ -364,10 +364,42 @@ Maksimal 1 pengajuan setiap bulan.
   <div id="adminNotificationList">
     <p>Memuat notifikasi...</p>
   </div>
+  
   <button class="secondary" onclick="loadAdminNotifications()">
     🔄 SEGARKAN NOTIFIKASI
   </button>
+
+  <hr style="border-color:#c69b43;margin:20px 0;">
+
+  <h3>📢 KIRIM NOTIFIKASI KE HP ANGGOTA</h3>
+
+  <input
+    type="text"
+    id="pushTitle"
+    placeholder="Judul pemberitahuan"
+    style="width:100%;margin-bottom:10px;"
+  >
+
+  <textarea
+    id="pushMessage"
+    placeholder="Tulis isi pemberitahuan..."
+    style="width:100%;min-height:100px;margin-bottom:10px;"
+  ></textarea>
+
+  <select id="pushTarget" style="width:100%;margin-bottom:10px;">
+    <option value="all">Semua Anggota</option>
+  </select>
+
+  <button
+    onclick="sendGesaPush()"
+    style="width:100%;background:#c69b43;color:#101d38;"
+  >
+    📲 KIRIM NOTIFIKASI
+  </button>
+
+  <p id="pushStatus"></p>
   </div>
+
 <div class="card" style="background:linear-gradient(135deg,#101d38,#1d355e);color:#f0cd78;text-align:center;">
   <h2 style="color:#f0cd78;border-bottom:1px solid #c69b43;">
     🦅 PANEL BENDAHARA GESA JAP
