@@ -1469,9 +1469,7 @@ async function sendGesaPush() {
     return;
   }
 
-  statusEl.textContent =
-    `Selesai. Berhasil: ${data.sent}, gagal: ${data.failed}, total: ${data.total}`;
-
+  statusEl.textContent = JSON.stringify(data);
   if (data.sent > 0) {
     titleEl.value = "";
     messageEl.value = "";
