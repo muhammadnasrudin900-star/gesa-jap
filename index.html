@@ -1361,9 +1361,14 @@ function openSettings(){
   if (error) throw error;
 };
   
+
 async function loadPushTargets() {
   const select = document.getElementById("pushTarget");
+  const status = document.getElementById("pushStatus");
+
   if (!select) return;
+
+  if (status) status.textContent = "Memuat daftar anggota...";
 
   const { data, error } = await db
     .from("profiles")
@@ -1372,21 +1377,33 @@ async function loadPushTargets() {
     .order("full_name");
 
   if (error) {
-    console.error("Gagal memuat anggota:", error);
+    console.error("Kesalahan daftar anggota:", error);
+    if (status) {
+      status.textContent = "Gagal memuat anggota: " + error.message;
+    }
     return;
   }
 
   select.innerHTML =
     '<option value="all">Semua Anggota</option>';
 
-  (data || []).forEach(member => {
+  if (!data || data.length === 0) {
+    if (status) status.textContent = "Data anggota belum ditemukan.";
+    return;
+  }
+
+  data.forEach(member => {
     const option = document.createElement("option");
     option.value = member.id;
-    option.textContent =
-      `${member.full_name} (No. ${member.member_no || "-"})`;
+    option.textContent = member.full_name;
     select.appendChild(option);
   });
+
+  if (status) {
+    status.textContent = data.length + " anggota berhasil dimuat.";
+  }
 }
+
 
 async function sendGesaPush() {
   const titleEl = document.getElementById("pushTitle");
