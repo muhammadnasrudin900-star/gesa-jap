@@ -514,8 +514,9 @@ async function loginUser(){
   profile.role==="admin"?"Bendahara GESA JAP":"Anggota GESA JAP";
  if(profile.role==="admin"){
   document.getElementById("adminArea").classList.remove("hidden");
-  loadAdminLoans();
-   loadAdminNotifications();
+    loadAdminLoans();
+  loadAdminNotifications();
+  loadPushTargets();
  }else{
   document.getElementById("memberArea").classList.remove("hidden");
   loadMyLoans();
