@@ -512,11 +512,13 @@ async function loginUser(){
  document.getElementById("welcome").textContent="Halo, "+profile.full_name;
  document.getElementById("roleText").textContent=
   profile.role==="admin"?"Bendahara GESA JAP":"Anggota GESA JAP";
- if(profile.role==="admin"){
+if(profile.role==="admin"){
   document.getElementById("adminArea").classList.remove("hidden");
-    loadAdminLoans();
+  loadAdminLoans();
   loadAdminNotifications();
+  alert("Dashboard bendahara berhasil dibuka!");
   loadPushTargets();
+}
  }else{
   document.getElementById("memberArea").classList.remove("hidden");
   loadMyLoans();
