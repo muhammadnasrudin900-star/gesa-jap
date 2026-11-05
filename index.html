@@ -539,6 +539,7 @@ async function loginUser(){
     document.getElementById("adminArea").classList.remove("hidden");
     loadAdminLoans();
     loadAdminNotifications();
+    loadPushTargets();
   } else {
     document.getElementById("memberArea").classList.remove("hidden");
     loadMyLoans();
