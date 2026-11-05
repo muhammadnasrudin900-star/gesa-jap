@@ -315,7 +315,7 @@ button.secondary:hover{
   📲 KIRIM NOTIFIKASI
 </button>
 
-<p id="pushStatus"></p>
+<p id="pushStatusMember"></p>
   </div>
 <div class="card">
 <h2>Informasi Pinjaman</h2>
@@ -1386,12 +1386,10 @@ function openSettings(){
   
 
 async function loadPushTargets() {
-  alert("FUNGSI LOAD PUSH TARGETS BERJALAN");
   const select = document.getElementById("pushTarget");
   const status = document.getElementById("pushStatus");
 
   if (!select) return;
-  alert("Fungsi daftar anggota dijalankan!");
 status.textContent = "Sedang mengambil data anggota...";
 
   if (status) status.textContent = "Memuat daftar anggota...";
